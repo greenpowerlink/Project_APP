@@ -6,18 +6,40 @@ router.get('/add', (req, res) => {
     res.render('links/add');
 });
 
+/* router.get('/uploaded', (req, res) => {
+    res.render('links/uploaded');
+});
+ */
 router.post('/add', async(req, res) => {
-    console.log(res);
-    const newfile = await pool.query("DELETE FROM `table 4` WHERE `COL 1`='Job', `COL 1`=''; ");
-    console.log(newfile);
+    const { title, url, description } = req.body;
+    const newlink = {
+        title,
+        url,
+        description
+    }
+    await pool.query('INSERT INTO links set ?', [newlink]);
+    console.log(newlink);
     res.redirect('/links');
 });
 
 router.get('/', async(req, res) => {
-    const links = await pool.query('SELECT * FROM employee');
+    const links = await pool.query('SELECT * FROM links');
     res.render('links/list', { links });
-    console.log(links);
 
+
+});
+
+router.get('/delete/:id', async(req, res) => {
+    const { id } = req.params;
+    await pool.query('DELETE FROM links WHERE id = ?', [id]);
+    res.redirect('/links');
+});
+
+router.get('/edit/:id', async(req, res) => {
+    const { id } = req.params;
+    const links = await pool.query('SELECT * FROM links WHERE id = ?', [id]);
+    console.log(links);
+    res.render('/links/edit', { links });
 });
 
 module.exports = router;
